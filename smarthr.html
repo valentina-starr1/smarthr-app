@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SmartHR – AI Powered HR App</title>
+  <style>
+    body {
+      background: #f5f7fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 18px #d0d4d9;
+      padding: 30px 26px;
+    }
+    h1 {
+      text-align: center;
+      color: #3949ab;
+      margin-bottom: 16px;
+    }
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    form textarea, form input {
+      border-radius: 7px;
+      border: 1px solid #bdbdbd;
+      padding: 8px;
+      font-size: 1em;
+      margin-bottom: 0;
+    }
+    form button {
+      grid-column: span 2;
+      background: #3949ab;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 9px 0;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background .2s;
+    }
+    form button:hover {
+      background: #283593;
+    }
+    .employee-card {
+      background: #f4f6fa;
+      border-radius: 7px;
+      box-shadow: 0 0 7px #dbdbdb;
+      margin-bottom: 18px;
+      padding: 12px 17px;
+    }
+    .emp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .analyze-btn {
+      background: #43a047;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 16px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background .2s;
+    }
+    .analyze-btn:hover {
+      background: #388e3c;
+    }
+    .analysis {
+      background: #e3ffe9;
+      border-radius: 5px;
+      margin-top: 7px;
+      padding: 8px 11px;
+      color: #2e7d32;
+      font-size: .98em;
+    }
+    label { font-weight: 500; color: #3949ab;}
+    input, textarea { margin-bottom: 0px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>SmartHR – Employee Directory</h1>
+    <form id="employee-form">
+      <div>
+        <label>Name</label>
+        <input type="text" id="name" required>
+      </div>
+      <div>
+        <label>Email</label>
+        <input type="email" id="email" required>
+      </div>
+      <div style="grid-column: span 2;">
+        <label>Resume (paste text)</label>
+        <textarea id="resume" rows="3" required></textarea>
+      </div>
+      <button type="submit">Add Employee</button>
+    </form>
+    <div id="directory">
+      <!-- Employee cards will go here -->
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById('employee-form');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const resumeInput = document.getElementById('resume');
+    const directory = document.getElementById('directory');
+    let employees = [];
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const employee = {
+        name: nameInput.value,
+        email: emailInput.value,
+        resume: resumeInput.value
+      };
+      employees.push(employee);
+      renderDirectory();
+      form.reset();
+    });
+
+    function renderDirectory() {
+      directory.innerHTML = '';
+      employees.forEach((emp, idx) => {
+        const card = document.createElement('div');
+        card.className = 'employee-card';
+        card.innerHTML = `
+          <div class="emp-header">
+            <div>
+              <strong>${emp.name}</strong><br>
+              <small>${emp.email}</small>
+            </div>
+            <button class="analyze-btn" onclick="analyzeResume(${idx})">Analyze Resume</button>
+          </div>
+          <div><strong>Resume:</strong> <span style="color: #616161">${emp.resume.slice(0,80)}${emp.resume.length>80?'...':''}</span></div>
+          <div id="analysis-${idx}"></div>
+        `;
+        directory.appendChild(card);
+      });
+    }
+
+    // Simple Resume analyzer—extract keywords/skills (primitive JS implementation)
+    window.analyzeResume = function(idx) {
+      const resume = employees[idx].resume;
+      const skills = ['JavaScript', 'HTML', 'CSS', 'Python', 'Java', 'Project Management', 'Leadership', 'React', 'Communication', 'SQL', 'Design'];
+      let found = [];
+      skills.forEach(skill => {
+        if (resume.toLowerCase().includes(skill.toLowerCase())) {
+          found.push(skill);
+        }
+      });
+      let analysis = `<div class="analysis"><strong>AI Analysis:</strong><br>`;
+      if (found.length) {
+        analysis += `Identified Skills: ${found.join(', ')}.<br>`;
+        analysis += `Profile Strengths: ${found.length>1 ? 'Multi-skilled' : 'Specialist'} candidate.<br>`;
+      } else {
+        analysis += 'No major skills detected, please add more keywords.';
+      }
+      analysis += '</div>';
+      document.getElementById('analysis-' + idx).innerHTML = analysis;
+    };
+  </script>
+</body>
+</html>
